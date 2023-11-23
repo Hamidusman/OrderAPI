@@ -1,9 +1,10 @@
 
-from .serializers import OrderSerializer  
+from .serializers import OrderSerializer, UserSerializer
 from .permissions import CustomerOrReadOnly
 from rest_framework import permissions
 from .models import Order
 from rest_framework import generics
+from django.contrib.auth.models import User
 from rest_framework import mixins
 # Create your views here.
 
@@ -21,3 +22,12 @@ class order_detail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, CustomerOrReadOnly]
  
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer

@@ -2,29 +2,28 @@ from rest_framework import serializers
 from .models import Order, FOODS, DRINKS
 from django.contrib.auth.models import User
 
-class OrderSerializer(serializers.ModelSerializer): 
+class OrderSerializer(serializers.ModelSerializer):
     customer = serializers.ReadOnlyField(source='customer.username')
+
     class Meta:
         model = Order
         fields = ['customer', 'food', 'food_quantity', 'drink', 'drink_quantity', 'ordered_at', 'completed']
 
 class UserSerializer(serializers.ModelSerializer):
-    order = serializers.PrimaryKeyRelatedField(many=True, queryset=Order.objects.all())
+    orders = OrderSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'order']
-    
+        fields = ['id', 'username', 'orders']
+
+    # If you want to allow creating orders through the user endpoint
     def create(self, validated_data):
-        # Extract the 'owner' data and remove it from the validated_data
-        owner_data = validated_data.pop('owner', None)
-        
-        # Create the Order instance
-        order = Order.objects.create(**validated_data)
+        orders_data = validated_data.pop('order', None)
 
-        # Set the 'owner' relationship separately
-        if owner_data:
-            order.customer = owner_data.get('customer', None)
-            order.save()
+        user = User.objects.create(**validated_data)
 
-        return order
+        if orders_data:
+            for order_data in orders_data:
+                Order.objects.create(user=user, **order_data)
+
+        return user

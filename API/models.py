@@ -18,10 +18,10 @@ DRINKS = [
 ]
 
 class Order(models.Model):  
-    customer = models.ForeignKey(User, related_name='orders', on_delete=models.CASCADE)
-    food = models.CharField(choices=FOODS, max_length=50)
-    food_quantity = models.PositiveIntegerField(default=1)
-    drink = models.CharField(choices=DRINKS, max_length=50)
-    drink_quantity = models.PositiveIntegerField(default=1)
+    customer = models.ForeignKey('auth.User', related_name='orders', on_delete=models.CASCADE)
+    food = models.CharField(choices=FOODS, max_length=50, null=True)
+    food_quantity = models.IntegerField(default=0)
+    drink = models.CharField(choices=DRINKS, max_length=50, null=True)
+    drink_quantity = models.IntegerField(default=0)
     ordered_at = models.DateTimeField(auto_now=True)
     completed = models.BooleanField(default=False)
